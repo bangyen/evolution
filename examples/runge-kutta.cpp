@@ -10,11 +10,13 @@ using std::endl;
 std::function<double(double, double, double)> rkm(
         double func(double, double),
         const vector<vector<double>> &matrix) {
-    // - func is the function on the right side of the ODE
-    // - matrix is the butcher tableau of a particular
-    //     runge kutta method
-    // - rkm() returns a function which computes the difference
-    //     between one stage and the next (y_{n + 1} - y_n)
+    /*
+       - func is the function on the right side of the ODE
+       - matrix is the butcher tableau of a particular
+           runge kutta method
+       - rkm() returns a function which computes the difference
+           between one stage and the next (y_{n + 1} - y_n)
+    */
 
     return [func, matrix](double x, double y, double h) {
         // size of tableau, array of each k_i,
@@ -49,10 +51,12 @@ int main() {
     // example from the following link:
     // https://math.okstate.edu/people/yqwang/teaching/math4513_fall11/Notes/rungekutta.pdf
 
-    // the butcher tableau of RK4,
-    //   leftmost column is nodes (c_i)
-    //   and bottom row is weights (b_i)
-    //   whereas the rest is the runge kutta matrix
+    /*
+       the butcher tableau of RK4,
+         leftmost column is nodes (c_i)
+         and bottom row is weights (b_i)
+         whereas the rest is the runge kutta matrix
+    */
     vector<vector<double>> matrix = {
         {0},
         {0.5, 0.5},
