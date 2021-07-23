@@ -7,7 +7,8 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-int main() {
+int main(int argc, char **argv) {
+    int val     = argc > 1 ? atoi(argv[1]) : 10;
     using sec   = std::chrono::duration<double>;
     using clock = std::chrono::system_clock;
     auto before = clock::now();
@@ -27,7 +28,7 @@ int main() {
         {0, 1/6.0, 1/3.0, 1/3.0, 1/6.0}
     };
 
-    for (int k = 0; k < 10; k++) {
+    for (int k = 0; k < val; k++) {
         // the ODE function and resultant stage function
         auto func = [k](double x, double y){return k * y;};
         auto diff = rkm(func, matrix);
@@ -48,7 +49,7 @@ int main() {
         res.push_back(y);
     }
 
-    for (int k = 0; k < 10; k++)
+    for (int k = 0; k < val; k++)
         cout << "e ^ " << 2 * k << " = "
              << res[k] << endl;
 
