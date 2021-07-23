@@ -9,10 +9,12 @@ using std::cout;
 using std::endl;
 
 int main(int argc, char **argv) {
+    // rename clock and get starting time
     using sec   = std::chrono::duration<double>;
     using clock = std::chrono::system_clock;
     auto before = clock::now();
 
+    // parallelization setup
     vector<double> res;
     int size, rank;
 
@@ -54,9 +56,11 @@ int main(int argc, char **argv) {
         x += h;
     }
 
+    // root process collects each y and stores in res
     MPI_Gather(&y, 1, MPI_DOUBLE, res.data(), 1,
                MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
+    // root process prints out result and time
     if (rank == 0) {
         for (int k = 0; k < size; k++)
             cout << "e ^ " << 2 * k << " = "

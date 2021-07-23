@@ -8,6 +8,10 @@ using std::cout;
 using std::endl;
 
 int main(int argc, char **argv) {
+    /*
+       rename clock, get starting time,
+         set number of iterations
+    */
     int val     = argc > 1 ? atoi(argv[1]) : 10;
     using sec   = std::chrono::duration<double>;
     using clock = std::chrono::system_clock;
@@ -49,10 +53,12 @@ int main(int argc, char **argv) {
         res.push_back(y);
     }
 
+    // print values
     for (int k = 0; k < val; k++)
         cout << "e ^ " << 2 * k << " = "
              << res[k] << endl;
 
+    // print time
     sec time = clock::now() - before;
     cout << "Duration: "
          << time.count()
