@@ -1,14 +1,13 @@
-#include <math.h>
-#include <vector>
+#include "runge-kutta.h"
 #include <iostream>
-#include <functional>
+#include <math.h>
 
 using std::vector;
 using std::cout;
 using std::endl;
 
 std::function<double(double, double, double)> rkm(
-        double func(double, double),
+        std::function<double(double, double)> func,
         const vector<vector<double>> &matrix) {
     /*
        - func is the function on the right side of the ODE
@@ -37,17 +36,13 @@ std::function<double(double, double, double)> rkm(
             double k = func(x + h * matrix[m][0], arg);
             sum += k * matrix[size - 1][m + 1];
             arr.push_back(k);
-
-            cout << "k" << m + 1 << ": f("
-                << x + h * matrix[m][0] << ", "
-                << arg << ") = " << k << endl;
         }
 
         return h * sum;
     };
 }
 
-int main() {
+void example() {
     // example from the following link:
     // https://math.okstate.edu/people/yqwang/teaching/math4513_fall11/Notes/rungekutta.pdf
 
@@ -87,6 +82,4 @@ int main() {
 
     cout << "The answer is " << y
          << "." << endl;
-
-    return 0;
 }
