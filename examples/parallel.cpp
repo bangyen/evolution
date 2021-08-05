@@ -2,7 +2,7 @@
 #include <math.h>
 #include <chrono>
 #include <iostream>
-#include "./runge-kutta.h"
+#include "runge-kutta.h"
 
 using std::vector;
 using std::cout;
