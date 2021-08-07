@@ -28,7 +28,7 @@ int main() {
         x += h;
 
         cout << "y(" << x << ") = "
-            << y << endl << endl;
+            << y << endl;
     }
 
     cout << "The answer is " << y
