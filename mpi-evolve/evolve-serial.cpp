@@ -1,14 +1,12 @@
 #include <iostream>
 #include <cmath>
-#include "gpd.h"
 #include "evolve.h"
+#include "../common/gpd.h"
 #include "../common/runge-kutta.h"
 
 using std::vector;
 
-int main(int argc, char** argv) {
-    // num  = number of steps (command line arg)
-    double num = argc > 1 ? atoi(argv[1]) : 10;
+vector<double> serial(int num) {
     vector<double> res, temp;
     int p;
 
@@ -80,11 +78,5 @@ int main(int argc, char** argv) {
         w += dw;
     }
 
-    // print estimated u-values
-    for (int n = 1; n < num; n++)
-        std::cout << "x: "      << value(n, num)
-                  << ", u: "    << temp[n]
-                  << std::endl;
-
-    return 0;
+    return temp;
 }
