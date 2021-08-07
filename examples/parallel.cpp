@@ -2,7 +2,7 @@
 #include <math.h>
 #include <chrono>
 #include <iostream>
-#include "runge-kutta.h"
+#include "../common/runge-kutta.h"
 
 using std::vector;
 using std::cout;
@@ -25,23 +25,9 @@ int main(int argc, char **argv) {
     if (rank == 0)
         res.resize(size);
 
-    /*
-       the butcher tableau of RK4,
-         leftmost column is nodes (c_i)
-         and bottom row is weights (b_i)
-         whereas the rest is the runge kutta matrix
-    */
-    vector<vector<double>> matrix = {
-        {0},
-        {0.5, 0.5},
-        {0.5, 0, 0.5},
-        {1, 0, 0, 1},
-        {0, 1/6.0, 1/3.0, 1/3.0, 1/6.0}
-    };
-
     // the ODE function and resultant stage function
     auto func = [rank](double x, double y){return rank * y;};
-    auto diff = rkm(func, matrix);
+    auto diff = rkm(func, rk4);
 
     // initializing the variables necessary between stages
     double x    {0},                      // initial x

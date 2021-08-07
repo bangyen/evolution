@@ -1,4 +1,4 @@
-#include "runge-kutta.h"
+#include "../common/runge-kutta.h"
 #include <iostream>
 #include <chrono>
 #include <math.h>
@@ -18,24 +18,10 @@ int main(int argc, char **argv) {
     auto before = clock::now();
     vector<double> res;
 
-    /*
-       the butcher tableau of RK4,
-         leftmost column is nodes (c_i)
-         and bottom row is weights (b_i)
-         whereas the rest is the runge kutta matrix
-    */
-    vector<vector<double>> matrix = {
-        {0},
-        {0.5, 0.5},
-        {0.5, 0, 0.5},
-        {1, 0, 0, 1},
-        {0, 1/6.0, 1/3.0, 1/3.0, 1/6.0}
-    };
-
     for (int k = 0; k < val; k++) {
         // the ODE function and resultant stage function
         auto func = [k](double x, double y){return k * y;};
-        auto diff = rkm(func, matrix);
+        auto diff = rkm(func, rk4);
 
         // initializing the variables necessary between stages
         double x {0},                        // initial x
