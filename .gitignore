@@ -30,11 +30,3 @@
 *.exe
 *.out
 *.app
-/mpi-evolve/test.cpp
-/.vs
-/x64/Debug
-/run.bat
-/evolution.vcxproj.user
-/evolution.vcxproj.filters
-/evolution.vcxproj
-/evolution.sln
