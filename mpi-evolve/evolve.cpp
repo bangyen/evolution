@@ -1,11 +1,10 @@
 #include <iostream>
-#include <vector>
 #include <cmath>
 #include <mpi.h>
 #include "gpd.h"
-#include "..\examples\runge-kutta.h"
+#include "evolve.h"
+#include "../common/runge-kutta.h"
 
-const double PI = 3.14159265358979323846;
 using std::vector;
 
 double alpha(double square, double lambda) {
@@ -43,7 +42,7 @@ double value(int num, int total) {
         * (num - part);
 }
 
-int main(int argc, char** argv) {
+vector<double> evolve(int argc, char** argv) {
     // parallelization setup
     vector<double> res;
     int size, rank;
@@ -63,15 +62,15 @@ int main(int argc, char** argv) {
        x    = x value for current process
        u    = estimated u(x, Q ^ 2)
     */
-    double c     = 4 / 3.0;
-    double zeta  = 0.0001;
-    double t     = -0.1;
-    double w     = log(0.09362);
-    double stop  = log(1);
-    double l     = 0.246;
-    double dw    = (stop - w) / size;
-    double x     = value(rank, size);
-    double u     = gpdHuplus(x, zeta, t);
+    double c    = 4 / 3.0;
+    double zeta = 0.0001;
+    double t    = -0.1;
+    double w    = log(0.09362);
+    double stop = log(1);
+    double l    = 0.246;
+    double dw   = (stop - w) / size;
+    double x    = value(rank, size);
+    double u    = gpdHuplus(x, zeta, t);
 
     /*
        the butcher tableau of RK4,
@@ -117,13 +116,12 @@ int main(int argc, char** argv) {
     MPI_Gather(&u, 1, MPI_DOUBLE, res.data(), 1,
         MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    // root process prints out result
-    if (rank == 0) {
-        for (int k = 1; k < size; k++)
-            std::cout << "x = "   << value(k, size)
-                      << ", u = " << res[k] << std::endl;
-    }
+    if (rank == 0)
+        for (int n = 1; n < size; n++)
+            std::cout << "x: "   << value(n, size)
+                      << ", u: " << res[n]
+                      << std::endl;
 
     MPI_Finalize();
-    return 0;
+    return res;
 }
