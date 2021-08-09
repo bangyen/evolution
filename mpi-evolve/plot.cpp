@@ -13,7 +13,7 @@ vector<double> serial(
 	double c, double l, int num);
 
 int main(int argc, char** argv) {
-	int    num  = argc > 1 ? atoi(argv[1]) : 50;
+	int    num  = argc > 1 ? atoi(argv[1]) : 100;
 	auto   func = gpdHuplus;
 	double stop = 1;
 	double zeta = 0.0001;
@@ -23,18 +23,17 @@ int main(int argc, char** argv) {
 
 	vector<double> val, init, res
 		= serial(stop, zeta, t, func, c, l, num);
-	res = vector<double>(res.begin() + 1, res.end());
 
-	for (int k = 1; k < num; k++) {
+	for (int k = 0; k < num; k++) {
 		double temp = value(k, num);
 
 		val.push_back(temp);
 		init.push_back(func(temp, zeta, t));
 	}
 
-	sciplot::Vec x(val.data(),  num - 1),
-				 y(init.data(), num - 1),
-				 z(res.data(),  num - 1);
+	sciplot::Vec x(val.data(),  num),
+				 y(init.data(), num),
+				 z(res.data(),  num);
 	sciplot::Plot plot;
 
 	plot.size(720, 400);

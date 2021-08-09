@@ -20,9 +20,9 @@ double alpha(double square, double lambda) {
    total = total number of x values
 */
 double step(int num, int total) {
-    int part = total / 3 * 2;
+    int part = ++total / 3 * 2;
 
-    if (num < part)
+    if (++num < part)
         return 0.2 / (pow(2, part) - 1);
     return 0.8 / (total - part);
 }
@@ -34,9 +34,9 @@ double step(int num, int total) {
    total = total number of x values
 */
 double value(int num, int total) {
-    int part = total / 3 * 2;
+    int part = ++total / 3 * 2;
 
-    if (num < part)
+    if (++num < part)
         return 0.2 / (pow(2, part) - 1)
             * (pow(2, num) - 1);
     return 0.2 + 0.8 / (total - part)
