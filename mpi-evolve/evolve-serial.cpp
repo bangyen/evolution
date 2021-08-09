@@ -1,7 +1,6 @@
 #include <iostream>
 #include <cmath>
 #include "evolve.h"
-#include "../common/gpd.h"
 #include "../common/runge-kutta.h"
 
 using std::vector;
