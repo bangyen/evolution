@@ -6,6 +6,7 @@
 #include "../common/runge-kutta.h"
 
 using std::vector;
+using std::function;
 
 double alpha(double square, double lambda) {
     return 4 * PI / (9 * log(square / pow(lambda, 2)));
@@ -42,7 +43,10 @@ double value(int num, int total) {
         * (num - part);
 }
 
-vector<double> evolve(int argc, char** argv) {
+vector<double> evolve(
+        double stop, double zeta, double t,
+        function<double(double, double, double)> func,
+        double c, double l, int argc, char** argv) {
     // parallelization setup
     vector<double> res;
     int size, rank;
@@ -62,32 +66,13 @@ vector<double> evolve(int argc, char** argv) {
        x    = x value for current process
        u    = estimated u(x, Q ^ 2)
     */
-    double c    = 4 / 3.0;
-    double zeta = 0.0001;
-    double t    = -0.1;
     double w    = log(0.09362);
-    double stop = log(1);
-    double l    = 0.246;
-    double dw   = (stop - w) / size;
+    double dw   = (log(stop) - w) / size;
     double x    = value(rank, size);
     double u    = gpdHuplus(x, zeta, t);
 
-    /*
-       the butcher tableau of RK4,
-         leftmost column is nodes (c_i)
-         and bottom row is weights (b_i)
-         whereas the rest is the runge kutta matrix
-    */
-    vector<vector<double>> matrix = {
-        {0},
-        {0.5, 0.5},
-        {0.5, 0, 0.5},
-        {1, 0, 0, 1},
-        {0, 1 / 6.0, 1 / 3.0, 1 / 3.0, 1 / 6.0}
-    };
-
     // the ODE function and resultant stage function
-    auto func = [&](double w2, double u2) {
+    auto stage = [&](double w2, double u2) {
         // each process collects u-values from each other
         MPI_Allgather(&u, 1, MPI_DOUBLE, res.data(), 1,
             MPI_DOUBLE, MPI_COMM_WORLD);
@@ -104,7 +89,7 @@ vector<double> evolve(int argc, char** argv) {
 
         return c * alpha(exp(w2), l) * sum / (2 * PI);
     };
-    auto diff = rkm(func, matrix);
+    auto diff = rkm(stage, rk4);
 
  // loop through each stage, updating w and u
     for (int n = 0; n < size; n++) {

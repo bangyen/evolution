@@ -5,8 +5,12 @@
 #include "../common/runge-kutta.h"
 
 using std::vector;
+using std::function;
 
-vector<double> serial(int num) {
+vector<double> serial(
+        double stop, double zeta, double t,
+        function<double(double, double, double)> func,
+        double c, double l, int num) {
     vector<double> res, temp;
     int p;
 
@@ -20,13 +24,8 @@ vector<double> serial(int num) {
        x    = x value for current process
        u    = estimated u(x, Q ^ 2)
     */
-    double c    = 4 / 3.0;
-    double zeta = 0.0001;
-    double t    = -0.1;
     double w    = log(0.09362);
-    double stop = log(1);
-    double l    = 0.246;
-    double dw   = (stop - w) / num;
+    double dw   = (log(stop) - w) / num;
 
     /*
        initialize res with initial
@@ -34,25 +33,11 @@ vector<double> serial(int num) {
     */
     for (int n = 0; n < num; n++) {
         double x = value(n, num);
-        temp.push_back(gpdHuplus(x, zeta, t));
+        temp.push_back(func(x, zeta, t));
     }
 
-    /*
-       the butcher tableau of RK4,
-         leftmost column is nodes (c_i)
-         and bottom row is weights (b_i)
-         whereas the rest is the runge kutta matrix
-    */
-    vector<vector<double>> matrix = {
-        {0},
-        {0.5, 0.5},
-        {0.5, 0, 0.5},
-        {1, 0, 0, 1},
-        {0, 1 / 6.0, 1 / 3.0, 1 / 3.0, 1 / 6.0}
-    };
-
     // the ODE function and resultant stage function
-    auto func = [&](double w2, double u2) {
+    auto stage = [&](double w2, double u2) {
         double x   = value(p, num);
         double sum = u2 * (2 * log(1 - x) + 1.5);
 
@@ -66,7 +51,7 @@ vector<double> serial(int num) {
 
         return c * alpha(exp(w2), l) * sum / (2 * PI);
     };
-    auto diff = rkm(func, matrix);
+    auto diff = rkm(stage, rk4);
 
     // loop through each stage, updating w and u
     for (int n = 0; n < num; n++) {
