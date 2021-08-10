@@ -1,12 +1,12 @@
+#include "../common/runge-kutta.h"
+#include "evolve.h"
 #include <iostream>
 #include <cmath>
-#include "evolve.h"
-#include "../common/runge-kutta.h"
 
 using std::vector;
 using std::function;
 
-vector<double> serial(
+extern vector<double> serial(
         double stop, double zeta, double t,
         function<double(double, double, double)> func,
         double c, double l, int num) {
