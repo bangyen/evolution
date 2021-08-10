@@ -22,7 +22,8 @@ double step(int num, int total) {
     int part = ++total / 3 * 2;
 
     if (++num < part)
-        return 0.2 / (pow(2, part) - 1);
+        return 0.2 / (pow(2, part) - 1)
+            * pow(2, num);
     return 0.8 / (total - part);
 }
 
