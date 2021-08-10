@@ -2,6 +2,7 @@
 #include "../common/gpd.h"
 #include "evolve.h"
 #include <vector>
+#include <string>
 #include <functional>
 
 using std::vector;
@@ -20,15 +21,20 @@ int main(int argc, char** argv) {
 	double t    = -0.1;
 	double c    = 4 / 3.0;
 	double l    = 0.246;
+	double a = 0, b = 0;
 
 	vector<double> val, init, res
 		= serial(stop, zeta, t, func, c, l, num);
 
 	for (int k = 0; k < num; k++) {
 		double temp = value(k, num);
+		double h    = step(k - 1, num);
 
 		val.push_back(temp);
 		init.push_back(func(temp, zeta, t));
+
+		a += init[k] * h;
+		b +=  res[k] * h;
 	}
 
 	sciplot::Vec x(val.data(),  num),
@@ -40,7 +46,7 @@ int main(int argc, char** argv) {
 	plot.xlabel("x");
 	plot.ylabel("u(x, Q^2)");
 	plot.xrange(0.0, 1.0);
-	plot.yrange(0.0, 5.0);
+	plot.yrange(0.0, 4.0);
 
 	plot.legend()
 		.atTop()
@@ -48,8 +54,8 @@ int main(int argc, char** argv) {
 		.displayHorizontal()
 		.displayExpandWidthBy(2);
 
-	plot.drawCurve(x, y).label("initial");
-	plot.drawCurve(x, z).label("estimated");
+	plot.drawCurve(x, y).label("Initial (Area: "   + std::to_string(a) + ")");
+	plot.drawCurve(x, z).label("Estimated (Area: " + std::to_string(b) + ")");
 	plot.show();
 
 	return 0;
