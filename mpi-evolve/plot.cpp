@@ -15,7 +15,7 @@ extern vector<double> serial(
 
 int main(int argc, char** argv) {
 	int    num  = argc > 1 ? atoi(argv[1]) : 100;
-	auto   func = gpdHuplus;
+	auto   func = gpdHu;
 	double stop = 1;
 	double zeta = 0.0001;
 	double t    = -0.1;
@@ -31,7 +31,8 @@ int main(int argc, char** argv) {
 		double h    = step(k - 1, num);
 
 		val.push_back(temp);
-		init.push_back(func(temp, zeta, t));
+		init.push_back(func(temp, zeta, t) * temp);
+		res[k] = res[k] * temp;
 
 		a += init[k] * h;
 		b +=  res[k] * h;
