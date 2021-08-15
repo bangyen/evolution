@@ -48,7 +48,7 @@ extern vector<double> serial(
             sum += val * step(k, num);
         }
 
-        return c * alpha(exp(w2), l) * sum / (2 * PI);
+        return c * alpha(exp(w2)) * sum / (2 * PI);
     };
     auto diff = rkm(stage, rk4);
 
