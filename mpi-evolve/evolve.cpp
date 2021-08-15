@@ -11,7 +11,8 @@ double alpha(double square, double lambda) {
 // translation of alpha_sub.f
 double alpha(double scale) {
     std::vector<double> xmas2, xmass = {1.4, 4.5, 170};
-    int nflavor;
+    double xlam = 0.215;
+    int    nflavor;
 
     for (auto k : xmass)
         xmas2.push_back(k * k);
@@ -25,23 +26,7 @@ double alpha(double scale) {
     else
         nflavor = 3;
 
-    double x, alphainv,
-           xlam  = 0.215,
-           beta0 = 11 - nflavor * 2 / 3.;
-
     switch (nflavor) {
-        case 6: {
-            double beta1 = 51 - nflavor * 19 / 3.;
-            double x6 = log(xmass[2] / pow(xlam, 2));
-            double add6 = 23 / 12. * x6 / (1 - 348 / 529. * log(x6) / x6)
-                - 21 / 12. * x6 / (1 - 234 / 441. * log(x6) / x6);
-
-            x = log(scale / pow(xlam, 2));
-            alphainv = beta0 / 4 * x
-                / (1 - 2 * beta1 / pow(beta0, 2) * log(x) / x) + add6;
-
-            return 1 / alphainv;
-        }
         case 5:
             xlam *= pow(xmass[1] / xlam, -2 / 23.);
             break;
@@ -50,8 +35,17 @@ double alpha(double scale) {
             break;
     }
 
-    x = log(scale / pow(xlam, 2));
-    alphainv = beta0 / 4 * x;
+    double beta0    = 11 - nflavor * 2 / 3.,
+           x        = log(scale / pow(xlam, 2)),
+           alphainv = beta0 / 4 * x;
+
+    if (nflavor == 6) {
+        double beta1 = 51 - nflavor * 19 / 3.;
+        double x6    = log(xmass[2] / pow(xlam, 2));
+        double add6  = 23 / 12. * x6 / (1 - 348 / 529. * log(x6) / x6)
+                     - 21 / 12. * x6 / (1 - 234 / 441. * log(x6) / x6);
+        alphainv = alphainv / (1 - 2 * beta1 / pow(beta0, 2) * log(x) / x) + add6;
+    }
 
     return 1 / alphainv;
 }
