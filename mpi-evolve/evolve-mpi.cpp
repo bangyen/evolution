@@ -11,12 +11,11 @@ using std::function;
 extern vector<double> evolve(
     double stop, double zeta, double t,
     function<double(double, double, double)> func,
-    double c, double l, int argc, char** argv) {
+    double c, double l) {
     // parallelization setup
     vector<double> res;
     int size, rank;
 
-    MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     res.resize(size);
@@ -66,6 +65,5 @@ extern vector<double> evolve(
     MPI_Gather(&u, 1, MPI_DOUBLE, res.data(), 1,
         MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    MPI_Finalize();
     return res;
 }
