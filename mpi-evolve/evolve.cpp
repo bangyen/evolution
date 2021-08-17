@@ -58,12 +58,8 @@ double alpha(double scale) {
    total = total number of x values
 */
 double step(int num, int total) {
-    int part = ++total / 3 * 2;
-
-    if (++num < part)
-        return 0.2 / (pow(2, part) - 1)
-            * pow(2, num);
-    return 0.8 / (total - part);
+    return value(num + 1, total)
+         - value(num, total);
 }
 
 /*
@@ -74,10 +70,11 @@ double step(int num, int total) {
 */
 double value(int num, int total) {
     int part = ++total / 3 * 2;
+    double mul = 1 + 10. / total;
 
     if (++num < part)
-        return 0.2 / (pow(2, part) - 1)
-            * (pow(2, num) - 1);
+        return 0.2 / (pow(mul, part) - 1)
+            * (pow(mul, num) - 1);
     return 0.2 + 0.8 / (total - part)
         * (num - part);
 }
