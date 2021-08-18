@@ -32,7 +32,7 @@ extern vector<double> serial(
     */
     for (int n = 0; n < num; n++) {
         double x = value(n, num);
-        temp.push_back(func(x, zeta, t));
+        temp.push_back(x * func(x, zeta, t));
     }
 
     // the ODE function and resultant stage function
