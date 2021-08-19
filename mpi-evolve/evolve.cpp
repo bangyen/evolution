@@ -47,7 +47,7 @@ double alpha(double scale) {
         alphainv = alphainv / (1 - 2 * beta1 / pow(beta0, 2) * log(x) / x) + add6;
     }
 
-    return 1 / alphainv;
+    return PI / alphainv;
 }
 
 /*
