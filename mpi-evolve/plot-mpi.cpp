@@ -41,10 +41,10 @@ int main(int argc, char** argv) {
             val.push_back(temp);
             init.push_back(func(temp, zeta, t));
 
-            if (xu) {
+            if (xu)
                 init[k] *= temp;
-                res[k] *= temp;
-            }
+            else
+                res[k] /= temp;
 
             a += init[k] * h;
             b += res[k] * h;

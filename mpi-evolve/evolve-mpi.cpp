@@ -33,7 +33,7 @@ extern vector<double> evolve(
     double w = log(0.09362);
     double dw = (log(stop) - w) / size;
     double x = value(rank, size);
-    double u = func(x, zeta, t);
+    double u = func(x, zeta, t) * x;
 
     // the ODE function and resultant stage function
     auto stage = [&](double w2, double u2) {
