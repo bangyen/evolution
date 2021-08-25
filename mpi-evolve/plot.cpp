@@ -23,8 +23,8 @@ int main(int argc, char** argv) {
            t    = 0,
            c    = 4 / 3.0,
            l    = 0.246;
-    bool   xu   = true;
-    bool   csv  = true;
+    bool   xu   = true,
+           csv  = true;
     
     vector<double> val, init, res;
 

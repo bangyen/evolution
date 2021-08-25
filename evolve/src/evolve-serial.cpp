@@ -1,5 +1,5 @@
-#include "../include/runge-kutta.h"
-#include "../include/evolve.h"
+#include "../common/runge-kutta.h"
+#include "evolve.h"
 #include <iostream>
 #include <cmath>
 
@@ -7,9 +7,10 @@ using std::vector;
 using std::function;
 
 extern vector<double> serial(
-        double stop, double zeta, double t,
+        vector<double> vec,
         function<double(double, double, double)> func,
-        double c, double l, int num) {
+        double stop, double zeta, double t,
+        double c, double l) {
     vector<double> res, temp;
     int p;
 
@@ -23,6 +24,7 @@ extern vector<double> serial(
        x    = x value for current process
        u    = estimated u(x, Q ^ 2)
     */
+    int    num  = vec.size();
     double w    = log(0.09362);
     double dw   = (log(stop) - w) / num;
 
@@ -30,25 +32,24 @@ extern vector<double> serial(
        initialize res with initial
        u-values for each x value
     */
-    for (int n = 0; n < num; n++) {
-        double x = value(n, num);
-        temp.push_back(func(x, zeta, t));
-    }
+    for (auto k : vec)
+        temp.push_back(k * func(k, zeta, t));
+    vec.push_back(1);
 
     // the ODE function and resultant stage function
     auto stage = [&](double w2, double u2) {
-        double x   = value(p, num);
+        double x   = vec[p];
         double sum = u2 * (2 * log(1 - x) + 1.5);
 
         // compute riemann sum
         for (int k = p; k < num; k++) {
-            double y   = value(k + 1, num);
+            double y   = vec[k + 1];
             double val = ((pow(x / y, 2) + 1)
                 * res[k] - 2 * u2) / (y - x);
-            sum += val * step(k, num);
+            sum += val * (y - vec[k]);
         }
 
-        return c * alpha(exp(w2), l) * sum / (2 * PI);
+        return c * alpha(exp(w2)) * sum / (2 * PI);
     };
     auto diff = rkm(stage, rk4);
 

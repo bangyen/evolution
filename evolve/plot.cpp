@@ -4,69 +4,77 @@
 #include <string>
 #include <functional>
 #include <fstream>
-//#include <sciplot/sciplot.hpp>
 
 using std::vector;
 using std::function;
 
 extern vector<double> serial(
-	double stop, double zeta, double t,
+	vector<double> val,
 	function<double(double, double, double)> func,
-	double c, double l, int num);
+	double stop, double zeta, double t,
+	double c, double l);
 
 int main(int argc, char** argv) {
-	int    num  = argc > 1 ? atoi(argv[1]) : 100;
-	auto   func = gpdHuplus;
-	double stop = 1;
-	double zeta = 0.0001;
-	double t    = -0.1;
-	double c    = 4 / 3.0;
-	double l    = 0.246;
-	double a    = 0;
-	double b    = 0;
+	int    num;
+    auto   func = gpdHu;
+    double a    = 0,
+		   b    = 0,
+           stop = 1,
+           zeta = 0,
+           t    = 0,
+           c    = 4 / 3.0,
+           l    = 0.246;
+    bool   xu   = true,
+		   csv  = true;
 
-	vector<double> val, init, res
-		= serial(stop, zeta, t, func, c, l, num);
+    vector<double> val, init, res;
+
+    if (csv) {
+        std::ifstream input("data.dat");
+        std::istream& s = input;
+        std::string str;
+
+        while (std::getline(s, str)) {
+            std::stringstream ss(str);
+            if (ss.good())
+            {
+                std::string substr;
+                std::getline(ss, substr, ' ');
+                val.push_back(std::stod(substr));
+            }
+        }
+
+        num = val.size();
+    }
+    else {
+        num = argc > 1 ? std::stoi(argv[1]) : 100;
+        for (int k = 0; k < num; k++)
+            val.push_back(value(k, num));
+    }
+
+    res = serial(val, func, stop, zeta, t, c, l);
+    val.push_back(1);
 
 	std::fstream fs;
 	fs.open ("output.csv", std::fstream::in | std::fstream::out | std::fstream::app);
 	fs << "x\t" << "init\t" << "res\n";
 
 	for (int k = 0; k < num; k++) {
-		double temp = value(k, num);
-		double h    = step(k - 1, num);
-
-		val.push_back(temp);
+		double temp = val[k];
+		double h = val[k + 1] - temp;
 		init.push_back(func(temp, zeta, t));
 
+		if (xu)
+			init[k] *= temp;
+		else
+			res[k] /= temp;
+
 		a += init[k] * h;
-		b +=  res[k] * h;
+		b += res[k] * h;
 
 		fs << val[k] << "\t" << init[k] << "\t" << res[k] << "\n";
 	}
 
 	fs.close();
-	/*
-	sciplot::Vec x(val.data(),  num),
-				 y(init.data(), num),
-				 z(res.data(),  num);
-	sciplot::Plot plot;
-
-	plot.size(720, 400);
-	plot.xlabel("x");
-	plot.ylabel("u(x, Q^2)");
-	plot.xrange(0.0, 1.0);
-	plot.yrange(0.0, 4.0);
-
-	plot.legend()
-		.atTop()
-		.fontSize(10)
-		.displayHorizontal()
-		.displayExpandWidthBy(2);
-
-	plot.drawCurve(x, y).label("Initial (Area: "   + std::to_string(a) + ")");
-	plot.drawCurve(x, z).label("Estimated (Area: " + std::to_string(b) + ")");
-	plot.show();
-	*/
 	return 0;
 }
