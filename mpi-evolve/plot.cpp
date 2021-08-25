@@ -9,12 +9,13 @@ using std::vector;
 using std::function;
 
 extern vector<double> serial(
-    double stop, double zeta, double t,
+    vector<double> val,
     function<double(double, double, double)> func,
-    double c, double l, int num);
+    double stop, double zeta, double t,
+    double c, double l);
 
 int main(int argc, char** argv) {
-    int    num  = argc > 1 ? std::stoi(argv[1]) : 100;
+    int    num;
     auto   func = gpdHu;
     double a = 0, b = 0,
            stop = 1,
@@ -22,16 +23,39 @@ int main(int argc, char** argv) {
            t    = 0,
            c    = 4 / 3.0,
            l    = 0.246;
-    bool   xu   = false;
+    bool   xu   = true;
+    bool   csv  = true;
+    
+    vector<double> val, init, res;
 
-    vector<double> val, init, res
-        = serial(stop, zeta, t, func, c, l, num);
+    if (csv) {
+        std::ifstream input("data.dat");
+        std::istream& s = input;
+        std::string str;
+
+        while (std::getline(s, str)) {
+            std::stringstream ss(str);
+            if (ss.good())
+            {
+                std::string substr;
+                std::getline(ss, substr, ' ');
+                val.push_back(std::stod(substr));
+            }
+        }
+
+        num = val.size();
+    } else {
+        num = argc > 1 ? std::stoi(argv[1]) : 100;
+        for (int k = 0; k < num; k++)
+            val.push_back(value(k, num));
+    }
+
+    res = serial(val, func, stop, zeta, t, c, l);
+    val.push_back(1);
 
     for (int k = 0; k < num; k++) {
-        double temp = value(k, num);
-        double h    = step(k - 1, num);
-
-        val.push_back(temp);
+        double temp = val[k];
+        double h    = val[k + 1] - temp;
         init.push_back(func(temp, zeta, t));
 
         if (xu)
@@ -63,6 +87,6 @@ int main(int argc, char** argv) {
     plot.drawCurve(x, y).label("Initial (Area: "   + std::to_string(a) + ")");
     plot.drawCurve(x, z).label("Estimated (Area: " + std::to_string(b) + ")");
     plot.show();
-
+    
     return 0;
 }
